@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import imagePlaceholder from "@/public/image-placeholder.png";
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
+import { Download } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -50,6 +51,20 @@ export default function Home() {
     staleTime: Infinity,
     retry: false,
   });
+
+  const handleDownload = () => {
+    if (!activeImage?.b64_json) return;
+    
+    // Create a link element
+    const link = document.createElement('a');
+    link.href = `data:image/png;base64,${activeImage.b64_json}`;
+    link.download = `blinkshot-${Date.now()}.png`;
+    
+    // Append to body, click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   let isDebouncing = prompt !== debouncedPrompt;
 
@@ -141,7 +156,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="mt-4 flex w-full max-w-4xl flex-col justify-center">
-            <div>
+            <div className="relative">
               <Image
                 placeholder="blur"
                 blurDataURL={imagePlaceholder.blurDataURL}
@@ -151,6 +166,14 @@ export default function Home() {
                 alt=""
                 className={`${isFetching ? "animate-pulse" : ""} max-w-full rounded-lg object-cover shadow-sm shadow-black`}
               />
+              <Button
+                onClick={handleDownload}
+                className="absolute bottom-4 right-4 inline-flex items-center gap-2 bg-gray-900/75 backdrop-blur-sm hover:bg-gray-900/90"
+                size="sm"
+              >
+                <Download className="size-4" />
+                Download
+              </Button>
             </div>
 
             <div className="mt-4 flex gap-4 overflow-x-scroll pb-4">
